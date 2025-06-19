@@ -30,19 +30,13 @@ app.use(cookieParser());  // Parse cookies
 // CORS configuration
 const allowedOrigins = config.cors.allowedOrigins;
 app.use(cors({
-  origin: function(origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: allowedOrigins, // Use the configured list of origins
   credentials: true
 }));
 
 // Routes
-app.use('/api/auth', authRoutes);
-app.use('/api', routerRoutes);
+app.use('/auth', authRoutes); // Path for authentication
+app.use('/', routerRoutes); // Path for all other proxied requests
 
 // Health check route
 app.get('/health', (req, res) => {
@@ -82,7 +76,7 @@ if (require.main === module) {
   
   // Handle unhandled rejections
   process.on('unhandledRejection', (err) => {
-    console.error('UNHANDLED REJECTION! 💥 Shutting down...');
+    console.error('UNHANDLED REJECTION! Shutting down...');
     console.error(err.name, err.message);
     process.exit(1);
   });

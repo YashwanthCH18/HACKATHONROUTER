@@ -36,7 +36,7 @@ Parameters:
     Default: https://user-api.example.com/api
   AllowedOrigins:
     Type: String
-    Default: http://localhost:3000,https://example.com
+    Default: "*"
 
 Resources:
   RouterFunction:

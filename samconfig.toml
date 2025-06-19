@@ -1,0 +1,10 @@
+version = 0.1
+[default.deploy.parameters]
+stack_name = "router-service"
+resolve_s3 = true
+s3_prefix = "router-service"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "DbHost=\"shortline.proxy.rlwy.net\" DbPort=\"49692\" DbName=\"railway\" DbUser=\"root\" DbPassword=\"fwbmUuEstVNVheIibURuBIOhlveCVZjo\" Port=\"5000\" NodeEnv=\"development\" JwtSecret=\"aVeryLongAndRandomSecretKeyForYourApp\" AdminBackendUrl=\"https://admin-api.example.com/api\" UserBackendUrl=\"https://user-api.example.com/api\" AllowedOrigins=\"http://192.168.0.203:3000,http://localhost:3000,http://localhost:5173\""
+image_repositories = []
