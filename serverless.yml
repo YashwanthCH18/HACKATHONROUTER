@@ -1,4 +1,7 @@
-service: hr-assistant-router-service
+service: router-service
+
+plugins:
+  - serverless-offline
 
 provider:
   name: aws
@@ -8,13 +11,18 @@ provider:
   memorySize: 256
   timeout: 30
   environment:
-    # Environment variables are loaded from .env file
-    JWT_SECRET: ${env:JWT_SECRET}
-    SUPABASE_JWT_SECRET: ${env:SUPABASE_JWT_SECRET}
-    ADMIN_BACKEND_URL: ${env:ADMIN_BACKEND_URL}
-    USER_BACKEND_URL: ${env:USER_BACKEND_URL}
-    NODE_ENV: ${env:NODE_ENV, 'development'}
-    ALLOWED_ORIGINS: ${env:ALLOWED_ORIGINS}
+    # Environment variables are loaded from env.yml file
+    DB_HOST: ${file(./env.yml):DB_HOST}
+    DB_PORT: ${file(./env.yml):DB_PORT}
+    DB_NAME: ${file(./env.yml):DB_NAME}
+    DB_USER: ${file(./env.yml):DB_USER}
+    DB_PASSWORD: ${file(./env.yml):DB_PASSWORD}
+    PORT: ${file(./env.yml):PORT}
+    JWT_SECRET: ${file(./env.yml):JWT_SECRET}
+    ADMIN_BACKEND_URL: ${file(./env.yml):ADMIN_BACKEND_URL}
+    USER_BACKEND_URL: ${file(./env.yml):USER_BACKEND_URL}
+    NODE_ENV: ${file(./env.yml):NODE_ENV, 'development'}
+    ALLOWED_ORIGINS: ${file(./env.yml):ALLOWED_ORIGINS}
 
 functions:
   api:
@@ -29,12 +37,6 @@ functions:
           method: ANY
           cors: true
 
-plugins:
-  - serverless-dotenv-plugin
-  - serverless-offline
-
 custom:
   serverless-offline:
     httpPort: 5000
-  dotenv:
-    path: ./.env 

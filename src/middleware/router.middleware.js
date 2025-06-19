@@ -14,9 +14,9 @@ const routeRequest = async (req, res, next) => {
     let targetUrl;
     
     // Determine target backend URL based on user role
-    if (role === 'admin') {
+    if (role === 'Admin') {
       targetUrl = `${config.backendServices.admin}${req.originalUrl.replace('/api', '')}`;
-    } else if (role === 'employee') {
+    } else if (role === 'Employee' || role === 'Manager') {
       targetUrl = `${config.backendServices.user}${req.originalUrl.replace('/api', '')}`;
     } else {
       const error = new Error(`Unsupported role: ${role}`);
