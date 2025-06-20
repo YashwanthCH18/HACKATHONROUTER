@@ -14,10 +14,14 @@ const routeRequest = async (req, res, next) => {
     let targetUrl;
     
     // Determine target backend URL based on user role
-    if (role === 'Admin') {
-      targetUrl = `${config.backendServices.admin}${req.originalUrl.replace('/api', '')}`;
-    } else if (role === 'Employee' || role === 'Manager') {
-      targetUrl = `${config.backendServices.user}${req.originalUrl.replace('/api', '')}`;
+    if (role.toLowerCase() === 'admin') {
+      // For admin, strip the /admin prefix from the path
+      const adminPath = req.originalUrl.replace(/^\/admin/, '');
+      targetUrl = `${config.backendServices.admin}${adminPath}`;
+    } else if (role.toLowerCase() === 'employee' || role.toLowerCase() === 'manager') {
+      // For user roles, strip the /user prefix from the path
+      const userPath = req.originalUrl.replace(/^\/user/, '');
+      targetUrl = `${config.backendServices.user}${userPath}`;
     } else {
       const error = new Error(`Unsupported role: ${role}`);
       error.statusCode = 403;
@@ -29,19 +33,25 @@ const routeRequest = async (req, res, next) => {
     // Log routing for debugging
     logRequest(req, targetUrl);
     
-    // Forward request to target backend with original headers and body
+    // Selectively forward only necessary headers to avoid contamination
+    const forwardedHeaders = {
+      'Content-Type': req.headers['content-type'] || 'application/json',
+      'Authorization': req.headers.authorization,
+      'x-forwarded-by': 'router-service',
+      'x-forwarded-for': req.ip,
+      'x-organization-id': req.user.organizationId,
+      'x-user-id': req.user.id
+    };
+
+    // Remove any undefined headers
+    Object.keys(forwardedHeaders).forEach(key => forwardedHeaders[key] === undefined && delete forwardedHeaders[key]);
+    
+    // Forward request to target backend with the clean headers and original body
     const response = await axios({
       method: req.method,
       url: targetUrl,
       data: req.body,
-      headers: {
-        ...req.headers,
-        // Add additional headers if needed
-        'x-forwarded-by': 'router-service',
-        'x-forwarded-for': req.ip,
-        'x-organization-id': req.user.organizationId,
-        'x-user-id': req.user.id
-      },
+      headers: forwardedHeaders,
       validateStatus: false // Don't throw error on non-2xx responses
     });
     
